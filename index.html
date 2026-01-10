@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Telegram Mini App</title>
+    <!-- Подключаем SDK Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        /* Обнуление стилей */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Переменные по умолчанию (если открыто не в Telegram, будет темная тема) */
+            --tg-theme-bg-color: #1c1c1e;
+            --tg-theme-text-color: #ffffff;
+            --tg-theme-hint-color: #999999;
+            --tg-theme-button-color: #3390ec;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #2c2c2e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            /* Убираем выделение текста для ощущения нативного приложения */
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        /* Стильная карточка */
+        .card {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        /* Аватарка (заглушка) */
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        p.username {
+            color: var(--tg-theme-hint-color);
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Кнопка внутри страницы */
+        .action-btn {
+            background-color: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .data-display {
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+            text-align: left;
+            background: rgba(0,0,0,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            display: none; /* Скрыто по умолчанию */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="avatar" id="avatar">U</div>
+            <h1 id="user_name">Привет, Гость!</h1>
+            <p class="username" id="user_tag">@unknown</p>
+            
+            <button class="action-btn" onclick="toggleCounter()">
+                Нажатий: <span id="counter">0</span>
+            </button>
+        </div>
+
+        <div id="user_data" class="data-display">
+            <!-- Сюда выведем JSON данных для отладки -->
+        </div>
+    </div>
+
+    <script>
+        // Инициализация веб-приложения
+        const tg = window.Telegram.WebApp;
+
+        // Расширяем приложение на весь экран
+        tg.expand();
+
+        // Элементы DOM
+        const nameEl = document.getElementById('user_name');
+        const tagEl = document.getElementById('user_tag');
+        const avatarEl = document.getElementById('avatar');
+        const dataEl = document.getElementById('user_data');
+        const counterEl = document.getElementById('counter');
+
+        let count = 0;
+
+        // Получаем данные пользователя
+        // initDataUnsafe содержит данные, если приложение открыто в Telegram
+        const user = tg.initDataUnsafe.user;
+
+        if (user) {
+            // Если есть имя пользователя
+            nameEl.innerText = `Привет, ${user.first_name}!`;
+            
+            // Если есть username
+            if (user.username) {
+                tagEl.innerText = `@${user.username}`;
+            } else {
+                tagEl.innerText = `ID: ${user.id}`;
+            }
+
+            // Первая буква имени в аватарку
+            avatarEl.innerText = user.first_name.charAt(0).toUpperCase();
+
+            // Для отладки покажем сырые данные (можно скрыть)
+            dataEl.style.display = 'block';
+            dataEl.innerText = JSON.stringify(user, null, 2);
+        } else {
+            // Если открыто в браузере (не в Telegram)
+            tagEl.innerText = "Откройте в Telegram";
+            dataEl.style.display = 'block';
+            dataEl.innerText = "Данные пользователя недоступны (вне Telegram)";
+        }
+
+        // Логика кнопки счетчика
+        function toggleCounter() {
+            count++;
+            counterEl.innerText = count;
+            
+            // Вибрация (Haptic Feedback) - работает только в Telegram
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+
+            // Если нажали 5 раз, покажем Главную Кнопку
+            if (count === 5) {
+                tg.MainButton.setText("Отправить результат");
+                tg.MainButton.show();
+            }
+        }
+
+        // Настройка Главной Кнопки (внизу экрана)
+        tg.MainButton.setParams({
+            text: 'Закрыть',
+            color: '#2cab37' // Свой зеленый цвет или используйте переменные
+        });
+
+        // Обработка клика по Главной Кнопке
+        tg.MainButton.onClick(function() {
+            // Отправляем данные боту (sendData)
+            const data = JSON.stringify({ count: count, userId: user ? user.id : 0 });
+            tg.sendData(data);
+            
+            // Или просто закрываем приложение
+            // tg.close(); 
+        });
+
+        // Сообщаем Telegram, что приложение готово
+        tg.ready();
+    </script>
+</body>
+</html>
