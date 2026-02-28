@@ -1,227 +1,616 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram Mini App</title>
-    <!-- Подключаем SDK Telegram -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python Developer | Vladimir Evgenievich</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --text: #ffffff;
+      --secondary: #a1a1aa;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --card: #17171c;
+      --border: #26262d;
+    }
 
-    <style>
-        /* Обнуление стилей */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
 
-        :root {
-            /* Цвета берутся из темы Телеграма */
-            --tg-theme-bg-color: #1c1c1e;
-            --tg-theme-text-color: #ffffff;
-            --tg-theme-hint-color: #999999;
-            --tg-theme-button-color: #3390ec;
-            --tg-theme-button-text-color: #ffffff;
-            --tg-theme-secondary-bg-color: #2c2c2e;
-        }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent;
-        }
+    /* --- Header & Nav --- */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 25px 8%;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(15,15,18,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 350px;
-            text-align: center;
-        }
+    .logo {
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
 
-        /* Карточка */
-        .card {
-            background-color: var(--tg-theme-secondary-bg-color);
-            border-radius: 20px;
-            padding: 30px 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-            transition: transform 0.2s;
-        }
+    nav a {
+      margin-left: 25px;
+      text-decoration: none;
+      color: var(--secondary);
+      font-size: 14px;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.3s;
+    }
 
-        .card:active {
-            transform: scale(0.98);
-        }
+    nav a:hover {
+      color: var(--text);
+    }
 
-        /* Аватарка */
-        .avatar {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: white;
-            font-weight: bold;
-            overflow: hidden; /* Чтобы картинка не вылезала за круг */
-        }
+    /* Анимация подчеркивания (общая для меню и футера) */
+    .hover-line::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: var(--accent);
+      transition: width 0.3s ease-in-out;
+    }
 
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .hover-line:hover::after {
+      width: 100%;
+    }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-            font-weight: 700;
-        }
+    /* --- Hero Section --- */
+    section {
+      padding: 100px 8%;
+      max-width: 1200px;
+      margin: auto;
+    }
 
-        p.username {
-            color: var(--tg-theme-hint-color);
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: center;
+      gap: 60px;
+    }
 
-        /* Кнопка */
-        .action-btn {
-            background-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: opacity 0.2s;
-        }
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 800;
+      margin-bottom: 25px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 1s forwards;
+    }
 
-        .action-btn:hover {
-            opacity: 0.9;
-        }
+    .hero p {
+      font-size: 18px;
+      color: var(--secondary);
+      margin-bottom: 35px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 1s 0.3s forwards;
+    }
 
-        /* Блок для данных (скрыт по умолчанию) */
-        .data-display {
-            margin-top: 20px;
-            font-size: 12px;
-            color: var(--tg-theme-hint-color);
-            text-align: left;
-            background: rgba(0,0,0,0.1);
-            padding: 10px;
-            border-radius: 10px;
-            display: none; /* <--- ТЕПЕРЬ ОН ТОЧНО СКРЫТ */
-            word-break: break-all;
-        }
-    </style>
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: 0.3s;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 1s 0.6s forwards;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(59,130,246,0.4);
+      background: var(--accent-hover);
+    }
+
+    .hero-box {
+      background: linear-gradient(145deg, #17171c, #111116);
+      padding: 40px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    /* --- General Layouts --- */
+    h2 {
+      font-size: 32px;
+      margin-bottom: 40px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px;
+    }
+
+    /* --- Cards --- */
+    .card {
+      background: var(--card);
+      padding: 40px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+      transform: translateY(40px);
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .card h3 {
+      margin-bottom: 20px;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+
+    .card p {
+      color: var(--secondary);
+    }
+
+    /* Специфика для карточек "Обо мне" и "Проекты" (без 3D наклона) */
+    .card-static:hover {
+      border-color: var(--accent);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* Специфика для карточек Услуг (с 3D наклоном) */
+    .service-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    
+    .service-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .service-card ul {
+      list-style: none;
+      margin-bottom: 30px;
+      flex-grow: 1; /* Чтобы кнопка всегда была внизу */
+    }
+
+    .service-card ul li {
+      margin-bottom: 14px;
+      color: var(--secondary);
+      position: relative;
+      padding-left: 22px;
+    }
+
+    .service-card ul li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    /* --- Price Tags / Buttons --- */
+    .price-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(90deg, var(--accent), #2563eb);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: none;
+      margin-top: auto;
+      transition: 0.3s;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+      border: 1px solid transparent;
+      width: fit-content;
+    }
+
+    .price-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .old-price {
+      text-decoration: line-through;
+      color: rgba(255,255,255,0.6);
+      font-weight: 400;
+      font-size: 13px;
+      margin-left: 10px;
+    }
+
+    /* --- Project Section (Video) --- */
+    .project-showcase {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .video-container {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+      position: relative;
+      aspect-ratio: 16/9; /* Соотношение сторон видео */
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .project-info h3 {
+      font-size: 28px;
+      margin-bottom: 15px;
+      color: var(--accent);
+    }
+
+    .project-info p {
+      font-size: 16px;
+      color: var(--secondary);
+      max-width: 800px;
+    }
+
+    /* --- Footer --- */
+    footer {
+      text-align: center;
+      padding: 60px 20px;
+      border-top: 1px solid var(--border);
+      color: var(--secondary);
+      font-size: 14px;
+      margin-top: 50px;
+    }
+
+    footer .links {
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    footer a {
+      color: var(--secondary);
+      text-decoration: none;
+      position: relative;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    footer a:hover {
+      color: var(--text);
+    }
+
+    /* --- Modal --- */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background: var(--card);
+      padding: 40px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 450px;
+      border: 1px solid var(--border);
+      text-align: center;
+      position: relative;
+      animation: fadeUp 0.4s ease forwards;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .modal-content h3 {
+      margin-bottom: 15px;
+    }
+
+    .modal-content hr {
+      border: none;
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    .modal-link {
+      display: block;
+      margin: 12px 0;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      transition: 0.3s;
+    }
+
+    .modal-link:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--secondary);
+      transition: 0.3s;
+    }
+
+    .close:hover {
+      color: var(--text);
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @media(max-width: 900px){
+      .hero{ grid-template-columns: 1fr; }
+      .grid-2{ grid-template-columns: 1fr; }
+      .hero h1{ font-size: 38px; }
+      nav { display: none; } /* Можно добавить бургер меню, но пока скроем для простоты */
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="card">
-            <!-- Сюда вставится или картинка, или буква -->
-            <div class="avatar" id="avatar"></div>
-            
-            <h1 id="user_name">Загрузка...</h1>
-            <p class="username" id="user_tag">...</p>
-            
-            <button class="action-btn" onclick="toggleCounter()">
-                Нажатий: <span id="counter">0</span>
-            </button>
-        </div>
+<header>
+  <div class="logo">Vladimir Evgenievich</div>
+  <nav>
+    <a href="#about" class="hover-line">Обо мне</a>
+    <a href="#services" class="hover-line">Услуги</a>
+    <a href="#projects" class="hover-line">Проекты</a>
+  </nav>
+</header>
 
-        <!-- Скрытый блок для отладки -->
-        <div id="user_data" class="data-display"></div>
+<section class="hero">
+  <div>
+    <h1>Я - Владимир</h1>
+    <p>Создаю Telegram-ботов, десктоп-приложения и инструменты для оптимизации работы. Помогаю с настройкой и очисткой ПК.</p>
+    <div class="btn" onclick="openModal()">Связаться со мной</div>
+  </div>
+  <div class="hero-box">
+    <h3>Текущий фокус</h3>
+    <p>— Разработка ботов<br>— Скрипты автоматизации<br>— Десктоп утилиты<br>— Оптимизация Windows</p>
+  </div>
+</section>
+
+<section id="about">
+  <h2>Обо мне</h2>
+  <div class="grid-3">
+    <div class="card card-static">
+      <h3>Кто я</h3>
+      <p>Я — начинающий Python‑разработчик, сосредоточенный на создании практичных и рабочих решений. Мне важно не просто написать код, а сделать инструмент, который действительно приносит пользу.</p>
+    </div>
+    <div class="card card-static">
+      <h3>Подход к работе</h3>
+      <p>Работаю аккуратно, структурировано и довожу задачи до результата. Предпочитаю минимализм, чистую архитектуру и понятную логику без лишних усложнений.</p>
+    </div>
+    <div class="card card-static">
+      <h3>Развитие</h3>
+      <p>Активно развиваюсь в направлении backend и автоматизации, собираю сильное портфолио и постоянно улучшаю уровень своих навыков через практику и реальные задачи.</p>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <h2>Услуги</h2>
+  <div class="grid-2">
+    <!-- Карточка 1 -->
+    <div class="card service-card">
+      <h3>ПРОФЕССИОНАЛЬНОЕ ОБСЛУЖИВАНИЕ ПК</h3>
+      <ul>
+        <li>Глубокая очистка системы от мусора и временных файлов</li>
+        <li>Полное удаление вирусов и вредоносного ПО</li>
+        <li>Точная настройка и оптимизация Windows</li>
+        <li>Установка и корректная конфигурация любого необходимого ПО</li>
+        <li>Регистрация и настройка аккаунтов на любых онлайн‑сервисах</li>
+      </ul>
+      <!-- Ссылка с готовым текстом для Telegram -->
+      <a href="https://t.me/Vladimir_Evgenievich0?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D1%8C%20%D0%9F%D1%80%D0%BE%D1%84%D0%B5%D1%81%D1%81%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5%20%D0%BE%D0%B1%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%9F%D0%9A%20%D0%B8%20%D1%83%D1%82%D0%BE%D1%87%D0%BD%D0%B8%D1%82%D1%8C%20%D1%83%20%D0%B2%D0%B0%D1%81:" target="_blank" class="price-btn">
+        Заказать за 199₽ <span class="old-price">399₽</span>
+      </a>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
+    <!-- Карточка 2 -->
+    <div class="card service-card">
+      <h3>РАЗРАБОТКА И СОЗДАНИЕ РЕШЕНИЙ</h3>
+      <ul>
+        <li>Создание десктоп‑приложений под индивидуальные задачи</li>
+        <li>Разработка Telegram‑ботов любой сложности</li>
+        <li>Оптимизация и улучшение существующего кода</li>
+        <li>Доработка и масштабирование текущих проектов</li>
+      </ul>
+      <!-- Ссылка с готовым текстом для Telegram -->
+      <a href="https://t.me/Vladimir_Evgenievich0?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D1%8C%20%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D1%83%20%D1%80%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D1%8F%20(Soft/Bot)%20%D0%B8%20%D1%83%D1%82%D0%BE%D1%87%D0%BD%D0%B8%D1%82%D1%8C%20%D1%83%20%D0%B2%D0%B0%D1%81:" target="_blank" class="price-btn">
+        Обсудить проект
+      </a>
+    </div>
+  </div>
+</section>
 
-        // Расширяем на весь экран
-        tg.expand();
+<section id="projects" class="projects">
+  <h2>Проекты</h2>
+  <div class="card card-static project-showcase">
+    <!-- Контейнер для видео -->
+    <div class="video-container">
+      <!-- ВАЖНО: Файл видео должен называться cursor.mp4 и лежать рядом с файлом index.html -->
+      <video id="projectVideo" src="cursor.mp4" muted playsinline loop></video>
+    </div>
+    <div class="project-info">
+      <h3>Cursor++</h3>
+      <p>Cursor++ — это продвинутая утилита для презентаций и экранной работы. Позволяет гибко настраивать подсветку и поведение курсора, акцентируя внимание аудитории на важных деталях. Интерфейс выполнен в современной стилистике «Magic UI», превращая рутинное управление в эстетический процесс.</p>
+    </div>
+  </div>
+</section>
 
-        const nameEl = document.getElementById('user_name');
-        const tagEl = document.getElementById('user_tag');
-        const avatarEl = document.getElementById('avatar');
-        const dataEl = document.getElementById('user_data');
-        const counterEl = document.getElementById('counter');
+<footer>
+  <div class="links">
+    <a href="https://t.me/+yOqZqwpNLBtjMGZi" target="_blank" class="hover-line">TGK</a>
+    <a href="https://youtube.com/@v.e.kikkas" target="_blank" class="hover-line">YouTube</a>
+    <a href="https://vk.com/v.e.kikkas" target="_blank" class="hover-line">VK</a>
+    <a href="https://t.me/Vladimir_Evgenievich0" target="_blank" class="hover-line">Telegram</a>
+    <a href="mailto:v.e.kikkas@gmail.com" class="hover-line">Почта</a>
+  </div>
+  © 2026 Владимир. All rights reserved.
+</footer>
 
-        let count = 0;
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="close" onclick="closeModal()">✕</div>
+    <h3>Связь со мной</h3>
+    <hr>
+    <a href="https://t.me/Vladimir_Evgenievich0" target="_blank" class="modal-link">Telegram</a>
+    <a href="https://vk.com/v.e.kikkas" target="_blank" class="modal-link">VK</a>
+  </div>
+</div>
 
-        // Данные пользователя
-        const user = tg.initDataUnsafe.user;
+<script>
+  /* --- Анимация появления при скролле --- */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
 
-        if (user) {
-            // Имя
-            nameEl.innerText = `Привет, ${user.first_name}!`;
-            
-            // Тег или ID
-            if (user.username) {
-                tagEl.innerText = `@${user.username}`;
-            } else {
-                tagEl.innerText = `ID: ${user.id}`;
-            }
+  document.querySelectorAll('.card').forEach(card => {
+    observer.observe(card);
+  });
 
-            // АВАТАРКА: Проверяем, есть ли ссылка на фото
-            if (user.photo_url) {
-                avatarEl.innerHTML = `<img src="${user.photo_url}" alt="Avatar">`;
-            } else {
-                // Если нет фото, ставим первую букву
-                avatarEl.innerText = user.first_name.charAt(0).toUpperCase();
-            }
+  /* --- Логика Модального окна --- */
+  function openModal(){
+    document.getElementById('modal').classList.add('active');
+  }
 
-            // Мы скрыли "страшный текст", но в код он пишется (на всякий случай)
-            // Если захочешь увидеть данные, поменяй display: none на block в CSS
-            dataEl.innerText = JSON.stringify(user, null, 2);
-            
+  function closeModal(){
+    document.getElementById('modal').classList.remove('active');
+  }
+
+  // Закрытие по клику вне окна
+  document.getElementById('modal').addEventListener('click', (e) => {
+    if(e.target === document.getElementById('modal')) closeModal();
+  });
+
+  /* --- Логика 3D наклона (ТОЛЬКО для карточек Услуг) --- */
+  const serviceCards = document.querySelectorAll('.service-card');
+
+  serviceCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const maxRotate = 8; // Чуть уменьшил угол для большей строгости
+
+      // Инверсия Y для правильного наклона
+      const rotateX = ((y - centerY) / centerY) * -maxRotate;
+      const rotateY = ((x - centerX) / centerX) * maxRotate;
+
+      card.style.transition = 'none'; // Убираем задержку при движении
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transition = 'transform 0.5s ease'; // Плавный возврат
+      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+    });
+  });
+
+  /* --- Логика Видео (Play/Pause при скролле) --- */
+  const videoElement = document.getElementById('projectVideo');
+  
+  if(videoElement) {
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Видео видно - играем
+          videoElement.play().catch(e => console.log("Autoplay prevented:", e));
         } else {
-            // Если открыто не в Телеграме
-            nameEl.innerText = "Привет, Незнакомец!";
-            tagEl.innerText = "Зайди через Telegram";
-            avatarEl.innerText = "?";
-            dataEl.style.display = 'block'; // Показываем ошибку только если не в ТГ
-            dataEl.innerText = "Данные недоступны. Откройте приложение в Telegram.";
+          // Видео не видно - пауза
+          videoElement.pause();
         }
+      });
+    }, { threshold: 0.5 }); // Срабатывает, когда видно 50% видео
 
-        // Логика кликов
-        function toggleCounter() {
-            count++;
-            counterEl.innerText = count;
-            
-            // Вибрация при клике
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('light');
-            }
+    videoObserver.observe(videoElement);
+  }
+</script>
 
-            // Показываем кнопку "Отправить" после 5 кликов
-            if (count === 5) {
-                tg.MainButton.setText("Отправить результат");
-                tg.MainButton.show();
-            }
-        }
-
-        // Настройка Главной Кнопки
-        tg.MainButton.setParams({
-            color: '#2cab37'
-        });
-
-        // Клик по Главной Кнопке
-        tg.MainButton.onClick(function() {
-            const data = JSON.stringify({ count: count, userId: user ? user.id : 0 });
-            tg.sendData(data);
-        });
-
-        tg.ready();
-    </script>
 </body>
 </html>
